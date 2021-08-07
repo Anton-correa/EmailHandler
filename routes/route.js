@@ -8,8 +8,9 @@ router.post("/events", async (req, res) => {
 
     timestamp = Date.now;
     //validation lib Yup
-    
+    const subject = req.query.subject
     const action = req.query.action
+    const recipient = req.query.recipient
     // save email
     const eventCreate = new EmailDB({
       action,
