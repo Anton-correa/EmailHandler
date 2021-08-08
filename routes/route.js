@@ -4,18 +4,23 @@ const mongoose = require("mongoose");
 const EmailDB = require("../models/emails");
 
 router.post("/events", async (req, res) => {
-    //id = req.params.id;
-
-    timestamp = Date.now;
     //validation lib Yup
     const subject = req.query.subject
-    const action = req.query.action
-    const recipient = req.query.recipient
+    if (req.query.recipient.includes('@')) {
+      const recipient = req.query.recipient
+    } else {
+      res.status(400).send('<h3>The recipient is not an email</h3>')
+    }
+    if (req.query.action.toLowerCase() == 'open' || req.query.action.toLowerCase() == 'click') {
+      const action = req.query.action
+    } else {
+      res.status(400).send('<h3>The action that is given is not the correct one, please use \'open\' or \'click\'</h3>')
+    }
     // save email
     const eventCreate = new EmailDB({
       action,
       subject: req.query.subject,
-      recipient: req.query.recipient,
+      recipient,
     });
     // try {
     //   const emailSave = await post.save();
@@ -36,15 +41,15 @@ router.post("/events", async (req, res) => {
   router.get("/events/action/:actionType", async (req, res) => {
     res.send("hello world"+ req.params)
     console.log(req.params)
-    // try {
-    //   const post = await EmailDB.find({ 'action': req.params.actionType })
-    //   post.exec(function (err, result) {
-    //     if (err) return handleError(err);
-    //     res.render('emails', {emails: result})
-    //   })
-    // } catch (err) {
-    //   res.json({message: err})
-    // }
+    try {
+      const post = await EmailDB.find({ 'action': req.params.actionType })
+      post.exec(function (err, result) {
+        if (err) return handleError(err);
+        res.render('emails', {emails: result})
+      })
+    } catch (err) {
+      res.json({message: err})
+    }
   });
 
   router.get("/events/recipient/:recipientName", async (req, res) => {
