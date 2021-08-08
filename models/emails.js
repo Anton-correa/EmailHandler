@@ -7,8 +7,7 @@ const EmailSchema = mongoose.Schema({
     },
     subject: String,
     recipient: {
-        type: String,
-        match: ['@']
+        type: String
     },
     timestamp: {
         type: Date,

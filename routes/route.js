@@ -18,9 +18,9 @@ router.post("/events", async (req, res) => {
     }
     // save email
     const eventCreate = new EmailDB({
-      action,
-      subject: req.query.subject,
-      recipient,
+      action: req.query.action,
+      subject,
+      recipient: req.query.recipient,
     });
     // try {
     //   const emailSave = await post.save();
@@ -39,74 +39,51 @@ router.post("/events", async (req, res) => {
   });
   
   router.get("/events/action/:actionType", async (req, res) => {
-    res.send("hello world"+ req.params)
-    console.log(req.params)
-    try {
-      const post = await EmailDB.find({ 'action': req.params.actionType })
-      post.exec(function (err, result) {
-        if (err) return handleError(err);
-        res.render('emails', {emails: result})
-      })
-    } catch (err) {
+
+    EmailDB.find({ 'action': req.params.actionType }).lean()
+    .then((data) => {
+      res.render('emails', {emails: data})
+    }).catch((err) => {
       res.json({message: err})
-    }
+    })
   });
 
   router.get("/events/recipient/:recipientName", async (req, res) => {
-    res.send("hello world"+ req.params)
-    console.log(req.params)
-    // try {
-    //   const post = await EmailDB.find({ 'recipient': req.params.recipient })
-    //   post.exec(function (err, result) {
-    //     if (err) return handleError(err);
-    //     res.render('emails', {emails: result})
-    //   })
-    // } catch (err) {
-    //   res.json({message: err})
-    // }
+    EmailDB.find({ 'recipient': req.params.recipientName }).lean()
+    .then((data) => {
+      res.render('emails', {emails: data})
+    }).catch((err) => {
+      res.json({message: err})
+    })
   });
 
   router.get("/events/timestamp/:timestamp", async (req, res) => {
-    res.send("hello world"+ req.params)
-    console.log(req.params)
-    // try {
-    //   const post = await EmailDB.find({ 'recipient': req.params.recipient })
-    //   post.exec(function (err, result) {
-    //     if (err) return handleError(err);
-    //     res.render('emails', {emails: result})
-    //   })
-    // } catch (err) {
-    //   res.json({message: err})
-    // }
+    EmailDB.find({ 'timestamp': req.params.timestamp }).lean()
+    .then((data) => {
+      res.render('emails', {emails: data})
+    }).catch((err) => {
+      res.json({message: err})
+    })
   });
 
   router.get("/summary/recipient/:recipient", async (req, res) => {
-    res.send("hello world"+ req.params)
-    console.log(req.params)
-    // try {
-    //   const post = await EmailDB.find({ 'recipient': req.params.recipient })
-    //   post.exec(function (err, result) {
-    //     if (err) return handleError(err);
-    //     res.render('emails', {emails: result})
-    //   })
-    // } catch (err) {
-    //   res.json({message: err})
-    // }
+    
+    EmailDB.find({ 'recipient': req.params.recipient }).lean()
+    .then((data) => {
+      res.render('emails', {emails: data})
+    }).catch((err) => {
+      res.json({message: err})
+    })
   });
 
   router.get("/summary/startDate/:startDate/endDate/:endDate", async (req, res) => {
-    res.send("hello world"+ req.params)
-    res.status(400).send("")
-    console.log(req.params)
-    // try {
-    //   const post = await EmailDB.find({ 'recipient': req.params.recipient })
-    //   post.exec(function (err, result) {
-    //     if (err) return handleError(err);
-    //     res.render('emails', {emails: result})
-    //   })
-    // } catch (err) {
-    //   res.json({message: err})
-    // }
+    
+    EmailDB.find({ 'action': req.params.actionType }).lean()
+    .then((data) => {
+      res.render('emails', {emails: data})
+    }).catch((err) => {
+      res.json({message: err})
+    })
   });
 
   module.exports = router;
