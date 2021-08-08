@@ -4,7 +4,7 @@ const exphandle = require("express-handlebars");
 const path = require("path");
 const router = express.Router();
 const mongoose = require("mongoose");
-require("dotenv/config");
+require('dotenv').config()
 const emailRoute = require('./routes/route')
 const app = express();
 

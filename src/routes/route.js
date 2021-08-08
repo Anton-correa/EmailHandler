@@ -18,7 +18,7 @@ router.post("/events", async (req, res) => {
     }
     // save email
     const eventCreate = new EmailDB({
-      action: req.query.action,
+      action: req.query.action.toLowerCase(),
       subject,
       recipient: req.query.recipient,
     });
@@ -40,7 +40,7 @@ router.post("/events", async (req, res) => {
   
   router.get("/events/action/:actionType", async (req, res) => {
 
-    EmailDB.find({ 'action': req.params.actionType }).lean()
+    EmailDB.find({ 'action': req.params.actionType }).sort('recipient').lean()
     .then((data) => {
       res.render('emails', {emails: data})
     }).catch((err) => {
@@ -49,7 +49,7 @@ router.post("/events", async (req, res) => {
   });
 
   router.get("/events/recipient/:recipientName", async (req, res) => {
-    EmailDB.find({ 'recipient': req.params.recipientName }).lean()
+    EmailDB.find({ 'recipient': req.params.recipientName }).sort('recipient').lean()
     .then((data) => {
       res.render('emails', {emails: data})
     }).catch((err) => {
@@ -58,7 +58,7 @@ router.post("/events", async (req, res) => {
   });
 
   router.get("/events/timestamp/:timestamp", async (req, res) => {
-    EmailDB.find({ 'timestamp': req.params.timestamp }).lean()
+    EmailDB.find({ 'timestamp': req.params.timestamp }).sort('recipient').lean()
     .then((data) => {
       res.render('emails', {emails: data})
     }).catch((err) => {
@@ -66,8 +66,20 @@ router.post("/events", async (req, res) => {
     })
   });
 
-  router.get("/summary/recipient/:recipient", async (req, res) => {
-    
+  router.get("/summary", async (req, res) => {
+    let countOpen, countClick
+    EmailDB.countDocuments({'recipient': req.params.recipient}).where('action').equals('open')
+    .then((data) => {
+      countOpen = data
+    }).catch((err) => {
+      res.json({ message: err})
+    })
+    EmailDB.countDocuments({'recipient': req.params.recipient}).where('action').equals('click')
+    .then((data) => {
+      countClick = data
+    }).catch((err) => {
+      res.json({ message: err})
+    })
     EmailDB.find({ 'recipient': req.params.recipient }).lean()
     .then((data) => {
       res.render('emails', {emails: data})
