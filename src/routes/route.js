@@ -2,32 +2,32 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const EmailDB = require("../models/emails");
+const validator = require("validator");
 
 router.post("/events", async (req, res) => {
-    //validation lib Yup
+    //validation
     const subject = req.query.subject
-    if (req.query.recipient.includes('@')) {
-      const recipient = req.query.recipient
+    if (validator.isEmail(req.query.recipient)) { 
+      recipient = req.query.recipient;
     } else {
-      res.status(400).send('<h3>The recipient is not an email</h3>')
+      res.send('<h1>This is not a valid email address format</h1>');
     }
-    if (req.query.action.toLowerCase() == 'open' || req.query.action.toLowerCase() == 'click') {
-      const action = req.query.action
+  
+    if (
+      validator.equals(req.query.action.toLowerCase(), "click") ||
+      validator.equals(req.query.action.toLowerCase(), "open")
+    ) {
+      action = req.query.action;
     } else {
-      res.status(400).send('<h3>The action that is given is not the correct one, please use \'open\' or \'click\'</h3>')
+      res.send('<h1>Wrong action type, the only acceptable actions are open or click</h1>');
     }
+  
     // save email
     const eventCreate = new EmailDB({
-      action: req.query.action.toLowerCase(),
+      action,
       subject,
-      recipient: req.query.recipient,
+      recipient,
     });
-    // try {
-    //   const emailSave = await post.save();
-    //   res.json(emailSave);
-    // } catch (err) {
-    //   res.json({ message: err });
-    // }
     eventCreate
       .save()
       .then((data) => {
@@ -39,10 +39,10 @@ router.post("/events", async (req, res) => {
   });
   
   router.get("/events/action/:actionType", async (req, res) => {
-
+    
     EmailDB.find({ 'action': req.params.actionType }).sort('recipient').lean()
     .then((data) => {
-      res.render('emails', {emails: data})
+      res.render('emails', {emails: data, eventEmail: true})
     }).catch((err) => {
       res.json({message: err})
     })
@@ -51,7 +51,7 @@ router.post("/events", async (req, res) => {
   router.get("/events/recipient/:recipientName", async (req, res) => {
     EmailDB.find({ 'recipient': req.params.recipientName }).sort('recipient').lean()
     .then((data) => {
-      res.render('emails', {emails: data})
+      res.render('emails', {emails: data, eventEmail: true})
     }).catch((err) => {
       res.json({message: err})
     })
@@ -60,42 +60,46 @@ router.post("/events", async (req, res) => {
   router.get("/events/timestamp/:timestamp", async (req, res) => {
     EmailDB.find({ 'timestamp': req.params.timestamp }).sort('recipient').lean()
     .then((data) => {
-      res.render('emails', {emails: data})
+      res.render('emails', {emails: data, eventEmail: true})
     }).catch((err) => {
       res.json({message: err})
     })
   });
 
   router.get("/summary", async (req, res) => {
-    let countOpen, countClick
-    EmailDB.countDocuments({'recipient': req.params.recipient}).where('action').equals('open')
-    .then((data) => {
-      countOpen = data
-    }).catch((err) => {
-      res.json({ message: err})
-    })
-    EmailDB.countDocuments({'recipient': req.params.recipient}).where('action').equals('click')
-    .then((data) => {
-      countClick = data
-    }).catch((err) => {
-      res.json({ message: err})
-    })
-    EmailDB.find({ 'recipient': req.params.recipient }).lean()
-    .then((data) => {
-      res.render('emails', {emails: data})
-    }).catch((err) => {
-      res.json({message: err})
-    })
+
+    EmailDB.aggregate([ 
+      {
+        $group: {
+          recipient: "$recipient",
+          openActions: { $count: { $match: { action: "open" } } },
+          clickActions: { $count: { $match: { action: "click" } } },
+        },
+      },
+    ]).then((data) => {
+      res.render('emails', {emails: data, summary: true})
+    });
+  
   });
 
   router.get("/summary/startDate/:startDate/endDate/:endDate", async (req, res) => {
     
-    EmailDB.find({ 'action': req.params.actionType }).lean()
-    .then((data) => {
-      res.render('emails', {emails: data})
-    }).catch((err) => {
-      res.json({message: err})
-    })
+    EmailDB.aggregate([ 
+      {
+        $match: {
+          timestamp: { $gt: req.query.startDate, $lt: req.query.endDate },
+        },
+      },
+      {
+        $group: {
+          recipient: "$recipient",
+          openActions: { $count: { $match: { action: "open" } } },
+          clickActions: { $count: { $match: { action: "click" } } },
+        },
+      },
+    ]).then((data) => {
+      res.render('emails', {emails: data, summary: true})
+    });
   });
 
   module.exports = router;

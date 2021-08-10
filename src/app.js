@@ -1,7 +1,6 @@
 const express = require("express"); 
 const bodyparser = require("body-parser");
 const exphandle = require("express-handlebars");
-const path = require("path");
 const router = express.Router();
 const mongoose = require("mongoose");
 require('dotenv').config()
@@ -12,7 +11,6 @@ app.engine(
   "hbs",
   exphandle({
     extname: ".hbs",
-    layoutsDir: path.join(__dirname + "/views/layouts"),
     defaultLayout: "emails",
   })
 );

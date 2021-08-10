@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-
+var actions = require('../constants')
 const EmailSchema = mongoose.Schema({
     action: {
         type: String,
-        enum: ['open', 'click']
+        enum: [actions.OPEN, actions.CLICK]
     },
     subject: String,
     recipient: {
