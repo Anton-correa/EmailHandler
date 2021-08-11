@@ -4,30 +4,14 @@ const mongoose = require("mongoose");
 const EmailDB = require("../models/emails");
 const validator = require("validator");
 const actions = require('../constants')
+const validate = require('../validate')
 
 router.post("/events", (req, res) => {
-    //validation
+    
     const {subject, recipient, action} = req.query
-    if (validator.isEmpty(recipient) || !validator.isEmail(recipient)) { 
-      res.status(400);
-      res.send('<h1>This is not a valid email address format</h1>');
-      return
-    } 
-
-    if (validator.isEmpty(subject)) { 
-      res.status(400);
-      res.send('<h1>The subject of the email is empty</h1>');
-      return
-    } 
-  
-    if (
-      validator.isEmpty(action) || !validator.equals(action.toLowerCase(), actions.CLICK) ||
-      !validator.equals(action.toLowerCase(), actions.OPEN)
-    ) {
-      res.status(400)
-      res.send('<h1>Wrong action type, the only acceptable actions are open or click</h1>');
-      return
-    } 
+    validate.valRecipient(recipient)
+    validate.valSubject(subject)
+    validate.valAction(action)
   
     // save email
     const eventCreate = new EmailDB({
@@ -47,14 +31,7 @@ router.post("/events", (req, res) => {
   
   router.get("/events/action/:actionType", (req, res) => {
     const action = req.params.actionType
-    if (
-      validator.isEmpty(action) || !validator.equals(action.toLowerCase(), actions.CLICK) ||
-      !validator.equals(action.toLowerCase(), actions.OPEN)
-    ) {
-      res.status(400)
-      res.send('<h1>Wrong action type, the only acceptable actions are open or click</h1>');
-      return
-    } 
+    validate.valAction(action) 
 
     EmailDB.find({ 'action': action }).sort('recipient').lean()
     .then((data) => {
@@ -66,11 +43,7 @@ router.post("/events", (req, res) => {
 
   router.get("/events/recipient/:recipientName", (req, res) => {
     const recipient = req.params.recipientName
-    if (validator.isEmpty(recipient) || !validator.isEmail(recipient)) { 
-      res.status(400);
-      res.send('<h1>This is not a valid email address format</h1>');
-      return
-    } 
+    validate.valRecipient(recipient)
     EmailDB.find({ 'recipient': recipient }).sort('recipient').lean()
     .then((data) => {
       res.render('emails', {emails: data, eventEmail: true})
@@ -80,6 +53,7 @@ router.post("/events", (req, res) => {
   });
 
   router.get("/events/timestamp/:timestamp", (req, res) => {
+    validate.valTimestamp(req.params.timestamp)
     EmailDB.find({ 'timestamp': req.params.timestamp }).sort('recipient').lean()
     .then((data) => {
       res.render('emails', {emails: data, eventEmail: true})
@@ -88,39 +62,43 @@ router.post("/events", (req, res) => {
     })
   });
 
-  router.get("/summary", (req, res) => {
-
-    EmailDB.aggregate([ 
-      {
-        $group: {
-          recipient: "$recipient",
-          openActions: { $count: { $match: { action: actions.OPEN } } },
-          clickActions: { $count: { $match: { action: actions.CLICK } } },
-        },
-      },
-    ]).then((data) => {
-      res.render('emails', {emails: data, summary: true})
-    });
+  router.get("/summary/:recipient", (req, res) => {
+    validate.valRecipient(req.params.recipient)
+    var countOpen, countClick = 0
+    EmailDB.find({'recipient': req.params.recipient }).lean()
+    .then((data) => {
+      data.forEach(elem => {
+        if (elem.action === 'open') {
+          countOpen = countOpen + 1
+        } 
+        if(elem.action === 'click') {
+          countClick = countClick + 1
+        }
+      });
+      var emails = {recipient: req.params.recipient, countOpen: countOpen, countClick: countClick}
+      res.render('emails', {emails: emails, eventEmail: true})
+    }).catch((err) => {
+      res.json({message: err})
+    })
+    
   
   });
 
-  router.get("/summary/startDate/:startDate/endDate/:endDate", async (req, res) => {
-    
+  router.get("/summary/startDate/:startDate/endDate/:endDate", (req, res) => {
+    validate.valTimestamp(req.params.startDate)
+    validate.valTimestamp(req.params.endDate)
+    var countOpen, countClick = 0
     EmailDB.aggregate([ 
       {
         $match: {
-          timestamp: { $gt: req.query.startDate, $lt: req.query.endDate },
+          timestamp: { $gt: req.params.startDate, $lt: req.params.endDate },
         },
-      },
-      {
-        $group: {
-          recipient: "$recipient",
-          openActions: { $count: { $match: { action: "open" } } },
-          clickActions: { $count: { $match: { action: "click" } } },
-        },
-      },
+      }
     ]).then((data) => {
-      res.render('emails', {emails: data, summary: true})
+      countOpen = data.filter('open').length
+      countClick = data.filter('click').length
+      var emails = {countClick: countClick, countOpen: countOpen}
+      res.render('emails', {emails: emails, summary: true})
     });
   });
 

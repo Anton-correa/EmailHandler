@@ -17,14 +17,13 @@
     {{/each}}
     {{/if}}
     {{#if summary}}
-    {{#each emails}}
     <ul>
+        {{#if this.recipient}}
         <li>Recipient: {{this.recipient}}</li>
-        <li>Open action count: {{this.openActions}}</li>
-        <li>Click action count: {{this.clickActions}}</li>
-        <li>Timestamp: {{this.timestamp}}</li>
+        {{/if}}
+        <li>Open action count: {{this.countOpen}}</li>
+        <li>Click action count: {{this.countClick}}</li>
     </ul>
-    {{/each}}
     {{/if}}
 </body>
 </html>
