@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-var actions = require('../constants')
+const actions = require('../constants')
 const EmailSchema = mongoose.Schema({
     action: {
         type: String,

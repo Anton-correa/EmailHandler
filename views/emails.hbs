@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        Email service
+    </title>
+</head>
+<body>
+    {{#if eventEmail}}
+    {{#each emails}}
+    <ul>
+        <li>ID: {{this._id}}</li>
+        <li>Action: {{this.action}}</li>
+        <li>Subject: {{this.subject}}</li>
+        <li>Recipient: {{this.recipient}}</li>
+        <li>Timestamp: {{this.timestamp}}</li>
+    </ul>
+    {{/each}}
+    {{/if}}
+    {{#if summary}}
+    {{#each emails}}
+    <ul>
+        <li>Recipient: {{this.recipient}}</li>
+        <li>Open action count: {{this.openActions}}</li>
+        <li>Click action count: {{this.clickActions}}</li>
+        <li>Timestamp: {{this.timestamp}}</li>
+    </ul>
+    {{/each}}
+    {{/if}}
+</body>
+</html>
