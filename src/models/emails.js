@@ -3,11 +3,13 @@ var actions = require('../constants')
 const EmailSchema = mongoose.Schema({
     action: {
         type: String,
-        enum: [actions.OPEN, actions.CLICK]
+        enum: [actions.OPEN, actions.CLICK],
+        required: true
     },
     subject: String,
     recipient: {
-        type: String
+        type: String,
+        required: true
     },
     timestamp: {
         type: Date,
