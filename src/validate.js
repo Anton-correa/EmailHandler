@@ -1,5 +1,5 @@
-const validator = require('validate')
-const actions = require('../constants')
+const validator = require('validator')
+const actions = require('./constants')
 module.exports = {
     valRecipient: function(recipient) {
         if (validator.isEmpty(recipient) || !validator.isEmail(recipient)) { 

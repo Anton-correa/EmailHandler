@@ -4,7 +4,7 @@
   "description": "EmailHandler is a web application that handles the user input from a url parameter to search or create emails using POST or GET",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon src/app.js"
   },
   "author": "Antonio J Correa",

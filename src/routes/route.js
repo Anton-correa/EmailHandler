@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const EmailDB = require("../models/emails");
-const validator = require("validator");
-const actions = require('../constants')
-const validate = require('../validate')
+const validate = require('../validate.js')
 
 router.post("/events", (req, res) => {
     
@@ -27,6 +25,15 @@ router.post("/events", (req, res) => {
       .catch((err) => {
         res.json({ message: err });
       });
+  });
+
+  router.get("/events", (req, res) => {
+    EmailDB.find({ }).sort('recipient').lean()
+    .then((data) => {
+      res.render('emails', {emails: data, eventEmail: true})
+    }).catch((err) => {
+      res.json({message: err})
+    })
   });
   
   router.get("/events/action/:actionType", (req, res) => {
