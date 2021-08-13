@@ -5,6 +5,7 @@
     </title>
 </head>
 <body>
+    {{#if eventEmail}}
     {{#each emails}}
     <ul>
         <li>ID: {{this._id}}</li>
@@ -14,5 +15,17 @@
         <li>Timestamp: {{this.timestamp}}</li>
     </ul>
     {{/each}}
+    {{/if}}
+    {{#if summary}}
+    {{#each emails}}
+    <ul>
+        {{#if this.recipient}}
+        <li>Recipient: {{this.recipient}}</li>
+        {{/if}}
+        <li>Open action count: {{this.countOpen}}</li>
+        <li>Click action count: {{this.countClick}}</li>
+    </ul>
+    {{/each}}
+    {{/if}}
 </body>
 </html>

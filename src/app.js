@@ -7,6 +7,7 @@ require('dotenv').config()
 const emailRoute = require('./routes/route')
 const app = express();
 
+//Initialization of the handlebars engine
 app.engine(
   "hbs",
   exphandle({
@@ -18,9 +19,13 @@ app.set("view engine", "hbs");
 
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
+
+//Connection to database establishes
 mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true }, () =>
   console.log("connected to DB")
 );
+
+//Access routes for the application function
 app.use("/", router);
 app.use('/email', emailRoute)
 

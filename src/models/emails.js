@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const actions = require('../constants')
+//Database schema is created
 const EmailSchema = mongoose.Schema({
     action: {
         type: String,

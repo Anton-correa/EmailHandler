@@ -10,12 +10,12 @@ The email structure is as follows:
  - Recipient: This is the email address of the reciever of the email, and this field must be a valid email address and it is REQUIRED
  - Timestamp: This is the exact time when the email was created and this field is automatically added without user input
 
-## Using POST
+## Using method POST
 For storing an email the application uses the POST action with the information entered in the url as shown in the example:
 
 POST URL: localhost:3003/email/events
 
-## Using GET
+## Using method GET
 For getting the emails from the application using GET with the routes necessary for the search
 
 ### Getting emails by recipient
@@ -48,27 +48,4 @@ Example: localhost:3003/email/summary/bob@email.com
 
 ### Getting summary by range of dates
 GET URL: localhost:3003/summary/startDate/:startDate/endDate/:endDate
-Note: In the URL where ":startDate" and ":endDate" is written is where the user will write the starting date and ending date of the range of emails that will be retrieved to demonstrate the amount of times each recipient appears with the open and the click action between those dates, and the dates will be validaded in the application for any invalid date format (YYYY-MM-DD)
-
-## Licence
-MIT License
-
-Copyright (c) [year] [fullname]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Note: In the URL where ":startDate" and ":endDate" is written is where the user will write the starting date and ending date of the range of emails that will be retrieved to demonstrate the amount of times each recipient appears with the open and the click action between those dates, and the dates will be validaded in the application for any invalid date format (YYYY-mm-ddTHH:mm:ss)
