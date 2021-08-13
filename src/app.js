@@ -26,7 +26,9 @@ mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true }, () =>
 );
 
 //Access routes for the application function
-app.use("/", router);
+app.get("/", (req, res) => {
+  res.send("Email handler Server Running");
+});
 app.use('/email', emailRoute)
 
 
