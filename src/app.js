@@ -31,5 +31,5 @@ app.get("/", (req, res) => {
 });
 app.use('/email', emailRoute)
 
-
-app.listen(3003, () => console.log("Starting server"));
+const port = process.env.PORT || 3003;
+app.listen(port, () => console.log("Starting server"));
